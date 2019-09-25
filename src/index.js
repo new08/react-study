@@ -49,6 +49,7 @@ class Game extends React.Component {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
+        placement: null
       }],
       stepNumber: 0,
       xIsNext: true
@@ -65,7 +66,8 @@ class Game extends React.Component {
     squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
       history: history.concat([{
-        squares: squares
+        squares: squares,
+        placement: i
       }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
@@ -74,7 +76,6 @@ class Game extends React.Component {
 
   jumpTo(step) {
     this.setState({
-      history: this.state.history.slice(0, this.state.stepNumber + 1),
       stepNumber: step,
       xIsNext: 0 === (step % 2)
     });
@@ -90,16 +91,26 @@ class Game extends React.Component {
       : 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
 
     const moves = history.map((step, move) => {
+      const players = ['X', 'O'];
+      const player = (0 === move)
+        ? ''
+        : players[(move + 1) % 2]
+      const placement = calculateCoordinate(step.placement);
       const desc = move
-        ? 'Go to move #' + move
-        : 'Go to game start';
+        ? 'Go back'
+        : 'Reset';
       return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>
-            {desc}
-          </button>
-        </li>
-      )
+        <tr key={move}>
+          <td>{move}</td>
+          <td>{player}</td>
+          <td>{placement}</td>
+          <td>
+            <button onClick={() => this.jumpTo(move)}>
+              {desc}
+            </button>
+          </td>
+        </tr>
+      );
     })
 
     return (
@@ -110,9 +121,17 @@ class Game extends React.Component {
             handleClick={(i) => this.handleClick(i)}
           />
         </div>
+        <br/>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <table>
+            <thead>
+              <tr><td>#</td><td>Player</td><td>Placement</td><td>Action</td></tr>
+            </thead>
+            <tbody>
+              {moves}
+            </tbody>
+          </table>
         </div>
       </div>
     );
@@ -137,6 +156,21 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function calculateCoordinate(i) {
+  const coordinates = [
+    '(1,3)',
+    '(2,3)',
+    '(3,3)',
+    '(1,2)',
+    '(2,2)',
+    '(3,2)',
+    '(1,1)',
+    '(2,1)',
+    '(3,1)'
+  ];
+  return coordinates[i];
 }
 
 // ========================================
