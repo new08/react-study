@@ -101,7 +101,7 @@ class Game extends React.Component {
         : 'Reset';
       return (
         <tr key={move}>
-          <td>{move}</td>
+          <td>{this.state.stepNumber === move ? '☞' : move}</td>
           <td>{player}</td>
           <td>{placement}</td>
           <td>
